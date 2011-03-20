@@ -10,26 +10,30 @@ sub new {
 	my ($class, $window) = @_;
 
 	my $self = {
-		view	=> undef,
+		main	=> undef,
 		window	=> $window,
+		views	=> [],
 	};
-
-	$self->{view} = 
-
 	bless $self, $class;
+
+	$self->{main} = new View($buffer, $self);
+
 	$self->set_focus($self->add_buffer(new Buffer));
 	return $self;
 }
 
-sub add_buffer {
-	my ($self, $buf) = @_;
+sub split_view {
+	my ($self, $type) = @_;
+	$self->{main} = new Container($type, $self->{main}, $self);
 }
 
 sub set_focus {
-	my ($self, $bnum) = @_;
+	my ($self, $vnum) = @_;
 }
 
-sub keystroke {
+sub register_view {
+	my ($self, $view) = @_;
+	push @{$self->{views}}, $view;
 }
 
 sub get_lines {
