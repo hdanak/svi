@@ -15,13 +15,19 @@ sub new {
 	};
 	bless $self, $class;
 
-	$SIG{'__DIE__'} = sub { $self->quit }; 
-	$SIG{'WINCH'} = sub { $self->resize };
+	$SIG{'__DIE__'} = sub { print "Dying at ", caller; $self->quit }; 
+	$SIG{'WINCH'} = sub { $self->resize($self->query_size) };
 	$SIG{'TERM'} = sub { $self->quit };
 	$SIG{'KILL'} = sub { $self->quit };
 
+	$self->init;
+
 	return $self;
 }
+sub size:lvalue { (shift)->{size} }
+sub height:lvalue { (shift)->{size}->[0] }
+sub width:lvalue { (shift)->{size}->[1] }
+sub term { shift }
 
 sub init {
 	my ($self) = @_;
@@ -35,14 +41,20 @@ sub restore {
 	my ($self) = @_;
 	ReadMode('raw');
 	$self->resize($self->query_size);
+	$self->{window}->draw;
 }
 sub quit {
 	ReadMode 'normal';
+	exit;
 }
 
 sub write {
 	my ($self, @str) = @_;
 	print @str;
+}
+
+sub get_key {
+	return (ReadKey(0), ReadKey(-1));
 }
 
 sub query_cursor {
@@ -62,19 +74,20 @@ sub move_cursor {
 }
 
 sub query_size {
-	return \@{(GetTerminalSize())[0..1]};
+	my @term_size = (GetTerminalSize())[0..1];
+	return [$term_size[1], $term_size[0]];
 }
 sub resize {
 	my ($self, $size) = @_;
-	$self->{size} = $size;
-	$self->{window}->alert_resize($size);
+	$self->size = $size;
+	$self->{window}->resize($size);
 }
 
 sub _check_bounds {
 	my ($self, $point) = @_;
-	return 1 if ($point->[0] <= $self->{size}->[0]
+	return 1 if ($point->[0] <= $self->height
 		  && $point->[0] >= 1
-		  && $point->[1] <= $self->{size}->[1]
+		  && $point->[1] <= $self->width
 		  && $point->[1] >= 1);
 	return 0;
 }

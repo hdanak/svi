@@ -3,28 +3,35 @@ use strict;
 use warnings;
 
 package Page;
+use base qw(Container);
 
-use Buffer;
+use View;
+use SplitView;
 
 sub new {
-	my ($class, $window) = @_;
-
-	my $self = {
-		main	=> undef,
-		window	=> $window,
-		views	=> [],
-	};
+	my ($class, $origin, $size, $parent, $buffer) = @_;
+	my $self = new Container($origin, $size, $parent);
 	bless $self, $class;
 
-	$self->{main} = new View($buffer, $self);
+	$self->{views}	= [];
+	$self->add_child(
+		'main',
+		new View($origin, $size, $self, $buffer),
+		undef, undef,
+	);
 
-	$self->set_focus($self->add_buffer(new Buffer));
+	$self->set_focus(0);
 	return $self;
+}
+
+sub draw {
+	my ($self) = @_;
+	$self->main->draw;
 }
 
 sub split_view {
 	my ($self, $type) = @_;
-	$self->{main} = new Container($type, $self->{main}, $self);
+	$self->main = new SplitView($type, $self->main, $self);
 }
 
 sub set_focus {
@@ -36,28 +43,5 @@ sub register_view {
 	push @{$self->{views}}, $view;
 }
 
-sub get_lines {
-	my ($self) = @_;
-	my @lines = ('x' x ($self->{window}->width/2)) x $self->{window}->visible_lines;
-	return \@lines;
-#	if (@{$self->{buffers}}) {
-#	}
-#	for (my $i = 0; $i < $self->{height}-1; $i++) {
-#		my $line = $page->get_line($i) // '~';
-#		my $padding = $self->{width} - length($line);
-#		$self->{cursor}->puts($line . ('x' x $padding));
-#	}
-#	else {
-#		return $lnum;
-#	}
-}
-
-sub resize {
-}
-
-sub cursor_loc {
-	my ($self) = @_;
-	return (0,0);
-}
 
 1
