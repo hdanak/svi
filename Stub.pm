@@ -26,9 +26,9 @@ sub new {
 sub init { return shift }
 
 ##
-#  Override 'notify_event' if you subscribe to events.
+#  Override 'notify' if you subscribe to events.
 ##
-sub notify_event {
+sub notify {
     my ($self, $event, $data) = @_;
 }
 

@@ -31,7 +31,7 @@ sub init {
     return $self
 }
 
-sub notify_event {
+sub notify {
     my ($self, $event, $data) = @_;
     {
         resize => sub { my ($event, $data) = @_;

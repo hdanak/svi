@@ -19,9 +19,9 @@ sub init {
 ##
 #  Add the client to the specified event's notification list. When an event of
 #  that type is received, every client in the notification list will be
-#  notified via their notify_event method.
+#  notified via their notify method.
 ##
-sub event_subscribe {
+sub subscribe {
     my ($self, $event, $client) = @_;
     push @{$self->{events}->{$event}}, $client;
     return
@@ -30,7 +30,7 @@ sub event_subscribe {
 ##
 #  Send an event to be relayed to all subscribed clients, along with some data.
 ##
-sub notify_event {
+sub notify {
     my ($self, $event, $data) = @_;
     my @subscribers = @{$self->{events}->{$event}};
     for (@subscribers) {

@@ -20,7 +20,7 @@ sub init {
     $self->cursor(0, 0);
 
 	$SIG{'__DIE__'} = sub { print 'Dying at '.caller; $self->quit }; 
-	$SIG{'WINCH'} = sub { $self->{controller}->notify_event('resize', [$self->size]) };
+	$SIG{'WINCH'} = sub { $self->{controller}->notify('resize', [$self->size]) };
 	$SIG{'TERM'} = sub { $self->quit };
 	$SIG{'KILL'} = $SIG{'TERM'};
 
