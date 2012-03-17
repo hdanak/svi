@@ -1,0 +1,23 @@
+.
+├── Buffer
+│   ├── Live
+│   │   └── File.pm - Uses Tie::File for live editing of text files.
+│   └── Transactional
+│       └── File.pm - Loads file into buffer, commits changes together
+├── Controller.pm - Handles config, keybindings and event dispatch
+├── Elements
+│   ├── CommandLine.pm - Statusbar ':' or '/' line on bottom
+│   ├── Container
+│   │   ├── Layout.pm - Manages multiple Views, via tabs or tiles
+│   │   └── Screen.pm - Defines placement of all UI elements
+│   ├── Container.pm - Container base class
+│   └── View
+│       └── Editor.pm - Edits and displays a text buffer
+├── MAP
+├── README
+├── Stub.pm - Basic boring OOP stuff, abstracted out
+├── svi.pl - Main entry point for svi, an editor made by combining the above elements
+└── Terminal
+    └── TTY.pm - An abstract connection to a user endpoint
+
+8 directories, 19 files
