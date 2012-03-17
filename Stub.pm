@@ -14,7 +14,9 @@ sub new {
     my $self = {};
 
     bless $self, $class;
-    $self->init(@_)
+    my $res = $self->init(@_);
+    return $res if defined $res;
+    return $self;
 }
 
 ##

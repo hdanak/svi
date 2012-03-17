@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Controller;
-@ISA = (Stub);
+use base 'Stub';
 
 
 =head2 SVI Controller
@@ -13,7 +13,6 @@ package Controller;
 sub init {
     my ($self) = @_;
     $self->{events} = {};
-    return $self;
 }
 
 ##

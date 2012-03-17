@@ -3,9 +3,7 @@ use strict;
 use warnings;
 
 package Element::Container;
-@ISA = (Stub);
-
-use feature 'given';
+use base 'Stub';
 
 
 =head2 Editor View Container
@@ -27,19 +25,19 @@ sub init {
     my ($self, $loc, $size, $controller) = @_;
 
     $self->{controller} = $controller;
-    $self->move @$loc;
-    $self->size @$size;
+    $self->move(@$loc);
+    $self->size(@$size);
 
     return $self
 }
 
 sub notify_event {
     my ($self, $event, $data) = @_;
-    given ($event) {
-        case 'resize' {
-            $self->size(@{$data->{size}})
+    {
+        resize => sub { my ($event, $data) = @_;
+            $self->size(@{$data->{size}});
         }
-    }
+    }->{$event, $data};
 }
 
 sub size {

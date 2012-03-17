@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use diagnostics;
 
 package Buffer::Transactional::File;
-@ISA = (Stub);
+use Buffer::History;
+use base 'Stub';
 
-use Try::Tiny;
 
 =head2 Transactional File Buffer
 
@@ -14,25 +15,28 @@ use Try::Tiny;
 sub init {
     my ($self, $filename) = @_;
     $self->{filename} = $filename;
-    $self->_open_file($filename) or return 0;
-    return $self
+    $self->{history} = History->new;
+    $self->{buffer} = ['']; # note that this is indexed from 1, not 0
+    $self->_load_file($filename) or return 0;
 }
 
-sub _open_file {
+sub _load_file {
     my ($self, $filename) = @_;
-    open($fh, "<", $filename) or return 0;
-    $self->{buffer} = [<$fh>];
+    open(my $fh, "<", $filename) or return 0;
+    $self->{buffer} = ['', <$fh>];
     close $fh;
     $self->{dirty} = 0;
 }
 
 sub _save_file {
     my ($self, $filename) = @_;
-    $filename //= $self->{filename}
+    $filename //= $self->{filename};
     open(my $fh, ">", $filename) or return 0;
     print $fh join("\n", @{$self->{buffer}});
     close $fh;
 }
+
+sub commit { shift->_save_file() }
 
 sub lines { int(@{shift->{buffer}}) }
 
@@ -47,29 +51,35 @@ sub text {
     return 0;
 }
 
-##
-#  Edit the buffer by passing in a change described by
-#  the list [action, line, col, data].
-#  'action' can be one of ( 'insert' | 'delete' ).
-#  'line' and 'col' and the position of the start of the change.
-#  'data' is either text to insert or number of characters to delete.
-##
 sub edit {
-    my ($self, $action, $line, $col, $data) = @_;
+    my ($self, $action, @args) = @_;
     {
-        'insert' => sub {
-            my ($line, $col, $text) = @_;
+        insert => sub { my ($line, $col, $text) = @_;
+            my $change = ['insert', $line, $col, $text];
+            my $inverse = ['delete', $line, $col, length($text)];
+            $self->{history}->change($change, $inverse);
         },
-        'delete' => sub {
-            my ($line, $col, $count) = @_;
+        delete => sub { my ($line, $col, $length) = @_;
+            my $change = ['delete', $line, $col, $length];
+            my $inverse = ['insert', $line, $col, substr($self->{buffer}->[$line], $col, $length)];
+            # TODO: splice out $line from buffer
         }, 
-    }->{$action}->($line, $col, $data) or die;
+        merge => sub { my ($line) = @_;
+            my $change = ['merge', $line];
+            my $inverse = ['split', $line, length($line)]; #XXX: off-by-one bug
+            # TODO: merge line $line+1 into $line
+        },
+        split => sub { my ($line, $col) = @_;
+            my $change = ['split', $line, $col];
+            my $inverse = ['merge', $line];
+            # TODO: insert line into buffer after $line, and move $col..-1 to it
+        },
+    }->{$action}->(@args) or die;
 }
 
-sub commit { shift->_save_file() }
-
-sub notify_event {
-    my ($self, $event, $data) = @_;
+sub undo {
+    my ($self) = @_;
+    return 0;
 }
 
 

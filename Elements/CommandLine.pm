@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Element::CommandLine;
-use Moose;
+use base 'Stub';
 
 
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Terminal::TTY;
-@ISA = (Stub);
+use base 'Stub';
 
 use Term::ReadKey;
 
@@ -16,7 +16,7 @@ sub init {
     my ($self, $controller) = @_;
 
     $self->controller = $controller;
-    $self->mode 'raw';
+    $self->mode('raw');
     $self->cursor(0, 0);
 
 	$SIG{'__DIE__'} = sub { print 'Dying at '.caller; $self->quit }; 
@@ -27,17 +27,13 @@ sub init {
     return $self;
 }
 
-sub notify_event {
-    my ($self, $event, $data) = @_;
-}
-
 sub freeze {
-    $self->mode 'normal';
+    shift->mode('normal');
 }
 
 sub restore {
 	my ($self) = @_;
-    $self->mode 'raw';
+    $self->mode('raw');
     $self->size;
 	$self->draw;
 }
