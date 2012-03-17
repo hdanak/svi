@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Element::Container::Layout;
-use Moose;
+use base 'Stub';
 
 
 

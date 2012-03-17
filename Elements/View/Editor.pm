@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Element::View::Editor;
-use Moose;
+use base 'Stub';
 
 
 

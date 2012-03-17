@@ -18,6 +18,7 @@ sub init {
     $self->{history} = History->new;
     $self->{buffer} = ['']; # note that this is indexed from 1, not 0
     $self->_load_file($filename) or return 0;
+    return
 }
 
 sub _load_file {

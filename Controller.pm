@@ -13,6 +13,7 @@ use base 'Stub';
 sub init {
     my ($self) = @_;
     $self->{events} = {};
+    return
 }
 
 ##
@@ -23,6 +24,7 @@ sub init {
 sub event_subscribe {
     my ($self, $event, $client) = @_;
     push @{$self->{events}->{$event}}, $client;
+    return
 }
 
 ##

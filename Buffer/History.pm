@@ -14,11 +14,13 @@ sub init {
     my ($self) = @_;
     $self->{root} = Node->new;
     $self->{head} = $self->{root};
+    return
 }
 
 sub change {
     my ($self, $change, $inverse) = @_;
     $self->{head} = $self->{head}->branch($change, $inverse);
+    return
 }
 
 sub undo {
